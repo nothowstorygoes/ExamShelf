@@ -11,4 +11,5 @@ body {
   padding: 0;
   height: 100%;
   font-family: 'Raleway', sans-serif;
+  overflow: hidden;
 }

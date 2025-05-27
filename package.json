@@ -11,10 +11,13 @@
   },
   "dependencies": {
     "@syncfusion/ej2-base": "^29.2.4",
+    "@syncfusion/ej2-react-navigations": "^29.2.7",
     "@syncfusion/ej2-react-pdfviewer": "^29.2.5",
+    "@syncfusion/ej2-react-splitbuttons": "^29.2.4",
     "@tailwindcss/vite": "^4.1.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-pdf": "^9.2.1",
     "react-router-dom": "^7.6.1",
     "tailwindcss": "^4.1.7",
     "vara": "^1.4.1",

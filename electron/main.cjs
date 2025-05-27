@@ -1,61 +1,65 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
-const fs = require('fs');
-const { shell } = require('electron');
-
+const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const path = require("path");
+const fs = require("fs");
+const { shell } = require("electron");
 
 //Main Window settings
 
-const customUserDataPath = path.join(app.getPath('appData'), 'Ergo', 'Notes In');
-const CogitoUserDataPath = path.join(app.getPath('appData'), 'Ergo', 'Cogito');
-app.setPath('userData', customUserDataPath)
+const customUserDataPath = path.join(
+  app.getPath("appData"),
+  "Ergo",
+  "Notes In"
+);
+const CogitoUserDataPath = path.join(app.getPath("appData"), "Ergo", "Cogito");
+app.setPath("userData", customUserDataPath);
 
 let mainWindow;
 
 function createMainWindow() {
-    mainWindow = new BrowserWindow({
-        width: 800, height: 600,
-        alwaysOnTop: false,
-        frame: false,
-        webPreferences: {
-            preload: path.join(__dirname, 'preload.js'), 
-            nodeIntegration: false,
-            contextIsolation: true,
-            webSecurity: true,
-        }
-    })
-    mainWindow.loadURL('http://localhost:5173')
+  mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    alwaysOnTop: false,
+    frame: false,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: false,
+      contextIsolation: true,
+      webSecurity: true,
+    },
+  });
+  mainWindow.loadURL("http://localhost:5173");
 }
 
 //Utility for TitleBar
 
 ipcMain.on("minimize", () => {
-  console.log('[Main] Minimize requested');
+  console.log("[Main] Minimize requested");
   if (mainWindow && !mainWindow.isDestroyed()) mainWindow.minimize();
 });
 ipcMain.on("close", () => {
-  console.log('[Main] Close requested');
+  console.log("[Main] Close requested");
   if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
 });
 ipcMain.on("reload", () => {
-  console.log('[Main] Reload requested');
+  console.log("[Main] Reload requested");
   if (mainWindow && !mainWindow.isDestroyed()) mainWindow.reload();
 });
 ipcMain.on("maximize", () => {
-    console.log('[Main] Maximize requested');
-    if (mainWindow && !mainWindow.isDestroyed()) {
-        if (mainWindow.isMaximized()) {
-            mainWindow.unmaximize(); // Torna alla dimensione precedente
-        } else {
-            mainWindow.maximize();
-        }
+  console.log("[Main] Maximize requested");
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize(); // Torna alla dimensione precedente
+    } else {
+      mainWindow.maximize();
     }
+  }
 });
 
 // Utility for Onboarding Data
 
 function getOnboardingPath() {
-  return path.join(app.getPath('userData'), 'onboarding.json');
+  return path.join(app.getPath("userData"), "onboarding.json");
 }
 
 function writeJson(filePath, data) {
@@ -67,44 +71,154 @@ function readJson(filePath) {
     try {
       return JSON.parse(fs.readFileSync(filePath));
     } catch (error) {
-      console.error('Error reading JSON file:', error);
+      console.error("Error reading JSON file:", error);
       return null;
     }
   }
   return null;
 }
 
-ipcMain.handle('get-onboarding-data', () => readJson(getOnboardingPath()));
-ipcMain.handle('set-onboarding-data', (event, data) => writeJson(getOnboardingPath(), data));
-
-
+ipcMain.handle("get-onboarding-data", () => readJson(getOnboardingPath()));
+ipcMain.handle("set-onboarding-data", (event, data) =>
+  writeJson(getOnboardingPath(), data)
+);
 
 // Utility for Cogito Integration
 function getCogitoPath() {
-  return path.join(CogitoUserDataPath, 'onboarding.json');
+  return path.join(CogitoUserDataPath, "onboarding.json");
 }
-ipcMain.handle('get-cogito-data', () => readJson(getCogitoPath()));
+ipcMain.handle("get-cogito-data", () => readJson(getCogitoPath()));
 ipcMain.handle("open-external", (event, url) => {
-    shell.openExternal(url);
+  shell.openExternal(url);
 });
-
 
 // Utility for Exams JSON
 
 function getExamsPath() {
-  return path.join(app.getPath('userData'), 'exams.json');
+  return path.join(app.getPath("userData"), "exams.json");
 }
 
-ipcMain.handle('load-exams-json', () => readJson(getExamsPath()) || []);
-ipcMain.handle('save-exams-json', (event, data) => writeJson(getExamsPath(), data));
+ipcMain.handle("load-exams-json", () => readJson(getExamsPath()) || []);
+ipcMain.handle("save-exams-json", (event, data) =>
+  writeJson(getExamsPath(), data)
+);
 
+// Utility for Exams Folders
+
+function getExamsDir() {
+  const dir = path.join(app.getPath("userData"), "Exams");
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+// Crea cartella esame
+ipcMain.handle("create-exam-folder", (event, examName) => {
+  const folderPath = path.join(getExamsDir(), examName);
+  if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath);
+  return true;
+});
+
+// Elimina cartella esame
+ipcMain.handle("delete-exam-folder", (event, examName) => {
+  const folderPath = path.join(getExamsDir(), examName);
+  if (fs.existsSync(folderPath))
+    fs.rmSync(folderPath, { recursive: true, force: true });
+  return true;
+});
+
+// Rinomina cartella esame
+ipcMain.handle("rename-exam-folder", (event, oldName, newName) => {
+  if (!oldName || !newName) {
+    console.error(
+      "rename-exam-folder: oldName or newName is missing",
+      oldName,
+      newName
+    );
+    return false;
+  }
+  const oldPath = path.join(getExamsDir(), oldName);
+  const newPath = path.join(getExamsDir(), newName);
+  if (fs.existsSync(oldPath)) {
+    fs.renameSync(oldPath, newPath);
+    return true;
+  }
+  return false;
+});
+
+// Utility for PDF Files in Exam Folders
+
+ipcMain.handle("list-pdf-files", (event, examName) => {
+  const dir = path.join(getExamsDir(), examName);
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir).filter((f) => f.toLowerCase().endsWith(".pdf"));
+});
+
+// Restituisce il path assoluto di un PDF (serve per react-pdf)
+ipcMain.handle("get-pdf-path", (event, examName, fileName) => {
+  return path.join(getExamsDir(), examName, fileName);
+});
+
+ipcMain.handle("open-pdf-dialog", async () => {
+  const result = await dialog.showOpenDialog({
+    filters: [{ name: "PDF", extensions: ["pdf"] }],
+    properties: ["openFile"],
+  });
+  if (result.canceled || !result.filePaths.length) return null;
+  return result.filePaths[0];
+});
+
+// Handler per copiare il PDF selezionato nella cartella dell'esame
+ipcMain.handle("add-pdf-to-exam", (event, examName, filePath) => {
+  if (!filePath) return false;
+  const destDir = path.join(getExamsDir(), examName);
+  if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
+  const fileName = path.basename(filePath);
+  const destPath = path.join(destDir, fileName);
+  fs.copyFileSync(filePath, destPath);
+  return true;
+});
+
+ipcMain.handle("get-pdf-base64", (event, examName, fileName) => {
+  const filePath = path.join(getExamsDir(), examName, fileName);
+  if (!fs.existsSync(filePath)) return null;
+  const buffer = fs.readFileSync(filePath);
+  return buffer.toString("base64");
+});
+
+ipcMain.handle("rename-pdf-file", (event, examName, oldFileName, newFileName) => {
+  const dir = path.join(getExamsDir(), examName);
+  const oldPath = path.join(dir, oldFileName);
+  const newPath = path.join(dir, newFileName);
+  if (!fs.existsSync(oldPath)) return false;
+  if (fs.existsSync(newPath)) return false; // prevent overwrite
+  try {
+    fs.renameSync(oldPath, newPath);
+    return true;
+  } catch (e) {
+    console.error("Rename PDF error:", e);
+    return false;
+  }
+});
+
+// Delete PDF file in exam folder
+ipcMain.handle("delete-pdf-file", (event, examName, fileName) => {
+  const filePath = path.join(getExamsDir(), examName, fileName);
+  if (!fs.existsSync(filePath)) return false;
+  try {
+    fs.unlinkSync(filePath);
+    return true;
+  } catch (e) {
+    console.error("Delete PDF error:", e);
+    return false;
+  }
+});
 
 //App Lyfecycle
 
 app.whenReady().then(() => {
-    createMainWindow()
-})
+  createMainWindow();
+});
 
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit()
-})
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
+});
