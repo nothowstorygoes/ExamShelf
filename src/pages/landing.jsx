@@ -9,6 +9,7 @@ import { useState } from 'react';
 export default function Landing() {
     const navigate = useNavigate();
     const [integration, setIntegration] = useState(false);
+    const [temp, setTemp] = useState(false); 
     useEffect(() => {
         window.electron.invoke("get-onboarding-data").then((res) => {
             if (res) {
@@ -51,12 +52,12 @@ export default function Landing() {
                     All your university notes and lecture PDFs, organized in one place. <br />Study <b>smarter</b>, not harder.
                 </p>
                 <button
-                    onClick={() => navigate("/getStarted")}
+                    onClick={() => navigate("/getStarted", { state: { temp } })}
                     className="w-30 bg-[#a6aae3] text-[#6331c9] rounded-4xl h-10 mt-4 cursor-pointer hover:bg-[#6331c9] hover:text-white hover:w-55 hover:rounded-2xl transition-all duration-500 ease-in-out">
                     Start
                 </button>
             </div>
-            {!integration && (
+            {!integration ? (
                 <p className='text-[#6331c9] text-center absolute bottom-2 w-120'>
                     <b>Notes In</b> is part of <b>Ergo Ecosystem</b>, check out{" "}
                     <a
@@ -71,6 +72,18 @@ export default function Landing() {
                     </a>{" "}
                     to easily improve your performance!
                 </p>
+            ) : (
+                 <div className="flex items-center justify-center absolute bottom-2 w-120">
+                    <input
+                        type="checkbox"
+                        className="mr-2"
+                        checked={temp}
+                        onChange={e => setTemp(e.target.checked)} // aggiorna temp
+                    />
+                    <label className="text-[#6331c9]">
+                        Use ergo's integration system with Cogito
+                    </label>
+                </div>
             )}
         </DefaultContainer>
 

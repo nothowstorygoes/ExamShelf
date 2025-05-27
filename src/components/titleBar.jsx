@@ -15,14 +15,7 @@ export default function TitleBar() {
         >
             {/* Right: Window Controls */}
             <div className="flex gap-2" style={{ WebkitAppRegion: "no-drag", padding: 10 }}>
-                <button onClick={() => window.electron.send("maximize")}
-                    className="p-0 m-0 bg-transparent border-none outline-none cursor-pointer"
-                    style={{ width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center" }}
-                >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <rect x="3" y="3" width="10" height="10" rx="2" stroke={iconColor} strokeWidth="2" fill="none" />
-                    </svg>
-                </button>
+                
                 {/* Minimize Button */}
                 <button
                     onClick={() => window.electron.send("minimize")}
@@ -31,6 +24,14 @@ export default function TitleBar() {
                 >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                         <rect x="3" y="8" width="10" height="2" rx="1" fill={iconColor} />
+                    </svg>
+                </button>
+                <button onClick={() => window.electron.send("maximize")}
+                    className="p-0 m-0 bg-transparent border-none outline-none cursor-pointer"
+                    style={{ width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center" }}
+                >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <rect x="3" y="3" width="10" height="10" rx="2" stroke={iconColor} strokeWidth="2" fill="none" />
                     </svg>
                 </button>
                 {/* Close Button */}

@@ -1,0 +1,21 @@
+@import '../../node_modules/@syncfusion/ej2-base/styles/tailwind3.css';
+@import '../../node_modules/@syncfusion/ej2-buttons/styles/tailwind3.css';
+@import '../../node_modules/@syncfusion/ej2-dropdowns/styles/tailwind3.css';
+@import '../../node_modules/@syncfusion/ej2-inputs/styles/tailwind3.css';
+@import '../../node_modules/@syncfusion/ej2-navigations/styles/tailwind3.css';
+@import '../../node_modules/@syncfusion/ej2-popups/styles/tailwind3.css';
+@import '../../node_modules/@syncfusion/ej2-splitbuttons/styles/tailwind3.css';
+@import '../../node_modules/@syncfusion/ej2-pdfviewer/styles/tailwind3.css';
+
+
+:root{
+    --color-sf-content-bg-color-alt1: #D2D6EF;
+    --color-sf-content-bg-color-alt2: #C3C7E9;
+    --color-sf-border-light: #D2D6EF;
+}
+
+.dark{
+    --color-sf-content-bg-color-alt1: #181825;
+    --color-sf-content-bg-color-alt2: #30304A;
+    --color-sf-border-light: #181825;
+}

@@ -77,6 +77,8 @@ function readJson(filePath) {
 ipcMain.handle('get-onboarding-data', () => readJson(getOnboardingPath()));
 ipcMain.handle('set-onboarding-data', (event, data) => writeJson(getOnboardingPath(), data));
 
+
+
 // Utility for Cogito Integration
 function getCogitoPath() {
   return path.join(CogitoUserDataPath, 'onboarding.json');
@@ -85,6 +87,18 @@ ipcMain.handle('get-cogito-data', () => readJson(getCogitoPath()));
 ipcMain.handle("open-external", (event, url) => {
     shell.openExternal(url);
 });
+
+
+// Utility for Exams JSON
+
+function getExamsPath() {
+  return path.join(app.getPath('userData'), 'exams.json');
+}
+
+ipcMain.handle('load-exams-json', () => readJson(getExamsPath()) || []);
+ipcMain.handle('save-exams-json', (event, data) => writeJson(getExamsPath(), data));
+
+
 //App Lyfecycle
 
 app.whenReady().then(() => {
