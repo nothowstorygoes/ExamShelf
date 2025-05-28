@@ -4,10 +4,12 @@ import { ContextMenuComponent } from "@syncfusion/ej2-react-navigations";
 import "@syncfusion/ej2-base/styles/material.css";
 import "@syncfusion/ej2-icons/styles/material.css";
 import "@syncfusion/ej2-react-navigations/styles/material.css";
+import { useTheme } from "../components/themeProvider";
 
 export default function ExamFolder({ exam, onRename, onDelete }) {
   const navigate = useNavigate();
   const contextMenuRef = useRef();
+  const { dark } = useTheme();
 
   const items = [
     { text: "Rename", iconCss: "e-icons e-edit", id: "rename" },
@@ -39,7 +41,9 @@ export default function ExamFolder({ exam, onRename, onDelete }) {
       <span role="img" aria-label="folder" className="text-8xl">
         📁
       </span>
-      <span className="mt-2 text-[#6331c9] font-bold">{trimName(exam)}</span>
+      <span className={`mt-2 font-bold ${dark ? "text-[#D2D6EF]" : "text-[#6331c9]"}`}>
+        {trimName(exam)}
+      </span>
       <ContextMenuComponent
         ref={contextMenuRef}
         items={items}

@@ -5,6 +5,7 @@ import GetStarted from "./pages/getStarted";
 import Home from "./pages/home";
 import PDFViewer from "./pages/pdfViewer"
 import Slides from "./pages/slides";
+import Settings from "./pages/settings";
 
 
 export default function App() {
@@ -52,6 +53,7 @@ export default function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/PDFViewer" element={<PDFViewer/>}/>
       <Route path="/slides" element={<Slides />} />
+      <Route path="/settings" element={<Settings />} />
     </Routes>
   );
 }

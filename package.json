@@ -1,9 +1,10 @@
 {
   "name": "notesin",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.2",
   "type": "module",
   "main": "electron/main.cjs",
+  "author": "nothowstorygoes",
   "scripts": {
     "dev": "concurrently \"vite\" \"cross-env ELECTRON_START_URL=http://localhost:5173 electron .\"",
     "build": "vite build",
@@ -15,6 +16,7 @@
     "@syncfusion/ej2-react-pdfviewer": "^29.2.5",
     "@syncfusion/ej2-react-splitbuttons": "^29.2.4",
     "@tailwindcss/vite": "^4.1.7",
+    "electron-updater": "^6.6.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-pdf": "^9.2.1",
@@ -39,5 +41,57 @@
     "typescript-eslint": "^8.30.1",
     "vite": "^6.3.5",
     "vite-plugin-electron-renderer": "^0.14.6"
+  },
+  "build": {
+    "appId": "com.notesIn.app",
+    "productName": "NotesIn",
+    "asar": true,
+    "publish": [
+      {
+        "releaseType": "release",
+        "provider": "github",
+        "owner": "nothowstorygoes",
+        "repo": "Notes-In"
+      }
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "public/",
+        "to": "public",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Cogito",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "deleteAppDataOnUninstall": true,
+      "runAfterFinish": true
+    }
   }
 }

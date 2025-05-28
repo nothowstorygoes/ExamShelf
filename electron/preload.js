@@ -5,5 +5,6 @@ contextBridge.exposeInMainWorld("electron", {
   receive: (channel, func) =>
     ipcRenderer.on(channel, (event, ...args) => func(...args)),
   invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args), // <-- Cambiato qui!
-  removeListener: (channel, func) => ipcRenderer.removeListener(channel, func) // aggiunto
+  removeListener: (channel, func) => ipcRenderer.removeListener(channel, func),
+  
 });

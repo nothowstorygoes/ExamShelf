@@ -2,6 +2,7 @@ import DefaultContainer from "../components/defaultContainter";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ExamFolder from "../components/examFolder";
+import { useTheme } from "../components/themeProvider";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function Home() {
   const [examName, setExamName] = useState("");
   const [renameModal, setRenameModal] = useState({ open: false, oldName: "" });
   const [renameValue, setRenameValue] = useState("");
+  const { dark } = useTheme();
 
   // Carica exams.json al mount
   useEffect(() => {
@@ -58,11 +60,18 @@ export default function Home() {
     setRenameValue(oldExamName);
   };
 
+  // Palette come settings.jsx
+  const buttonLight = "bg-[#6331c9] text-white hover:bg-[#4b2496]";
+  const buttonDark =
+    "bg-[#D2D6EF] text-[#181825] hover:bg-[#b8bce0] border border-[#D2D6EF]";
+
   return (
     <DefaultContainer className="relative">
       <div className="absolute top-20 right-10 flex md:flex-row lg:flex-col gap-10 items-center justify-center">
         <button
-          className="z-50 cursor-pointer bg-[#6331c9] text-white px-3 py-3 rounded-full text-3xl hover:bg-[#7a4ed1] transition-colors duration-300"
+          className={`z-50 cursor-pointer px-3 py-3 rounded-full text-3xl transition-colors duration-300 ${
+            dark ? buttonDark : buttonLight
+          }`}
           onClick={() => setShowModal(true)}
           aria-label="Add Exam"
         >
@@ -82,7 +91,9 @@ export default function Home() {
           </svg>
         </button>
         <button
-          className="z-50 cursor-pointer bg-[#6331c9] text-white px-3 py-3 rounded-full text-3xl hover:bg-[#7a4ed1] transition-colors duration-300"
+          className={`z-50 cursor-pointer px-3 py-3 rounded-full text-3xl transition-colors duration-300 ${
+            dark ? buttonDark : buttonLight
+          }`}
           onClick={() => navigate("/settings")}
           aria-label="Settings"
         >
@@ -108,7 +119,7 @@ export default function Home() {
         </button>
       </div>
       <div className="flex items-center justify-center w-full absolute top-20 mx-auto">
-        <h1 className="text-5xl text-[#6331c9]">Your Exams</h1>
+        <h1 className="text-5xl text-[#6331c9] dark:text-[#D2D6EF]">Your Exams</h1>
       </div>
       <div className="flex flex-wrap gap-6 mt-6 items-center justify-center">
         {exams.length === 0 ? (
@@ -130,8 +141,8 @@ export default function Home() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg flex flex-col items-center">
-            <h2 className="mb-4 text-lg font-bold text-[#6331c9]">
+          <div className={`p-6 rounded-xl shadow-lg flex flex-col items-center ${dark ? "bg-[#181825]" : "bg-white"}`}>
+            <h2 className={`mb-4 text-lg font-bold ${dark ? "text-[#D2D6EF]" : "text-[#6331c9]"}`}>
               Create new exam folder
             </h2>
             <input
@@ -139,17 +150,17 @@ export default function Home() {
               value={examName}
               onChange={(e) => setExamName(e.target.value)}
               placeholder="Name"
-              className="border px-3 py-2 rounded mb-4 w-64"
+              className={`border px-3 py-2 rounded mb-4 w-64 ${dark ? "bg-[#232336] text-white border-[#6331c9]" : ""}`}
             />
             <div className="flex gap-2">
               <button
-                className="cursor-pointer hover:bg-[#7a4ed1]  bg-[#6331c9] text-white px-4 py-2 rounded-2xl"
+                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${dark ? buttonDark : buttonLight}`}
                 onClick={handleAddExam}
               >
                 Add
               </button>
               <button
-                className="cursor-pointer hover:bg-[#7a4ed1] bg-gray-300 text-[#6331c9] px-4 py-2 rounded-2xl"
+                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${dark ? "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]" : "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]"}`}
                 onClick={() => setShowModal(false)}
               >
                 Cancel
@@ -160,8 +171,8 @@ export default function Home() {
       )}
       {renameModal.open && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg flex flex-col items-center">
-            <h2 className="mb-4 text-lg font-bold text-[#6331c9]">
+          <div className={`p-6 rounded-xl shadow-lg flex flex-col items-center ${dark ? "bg-[#181825]" : "bg-white"}`}>
+            <h2 className={`mb-4 text-lg font-bold ${dark ? "text-[#D2D6EF]" : "text-[#6331c9]"}`}>
               Rename exam folder
             </h2>
             <input
@@ -169,17 +180,17 @@ export default function Home() {
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}
               placeholder="New name"
-              className="border px-3 py-2 rounded mb-4 w-64"
+              className={`border px-3 py-2 rounded mb-4 w-64 ${dark ? "bg-[#232336] text-white border-[#6331c9]" : ""}`}
             />
             <div className="flex gap-2">
               <button
-                className="cursor-pointer hover:bg-[#7a4ed1]  bg-[#6331c9] text-white px-4 py-2 rounded-2xl"
+                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${dark ? buttonDark : buttonLight}`}
                 onClick={confirmRename}
               >
                 Rename
               </button>
               <button
-                className="cursor-pointer hover:bg-[#7a4ed1] bg-gray-300 text-[#6331c9] px-4 py-2 rounded-2xl"
+                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${dark ? "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]" : "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]"}`}
                 onClick={() => setRenameModal({ open: false, oldName: "" })}
               >
                 Cancel

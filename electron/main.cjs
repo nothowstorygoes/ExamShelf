@@ -1,7 +1,10 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
+const { autoUpdater } = require("electron-updater");
 const fs = require("fs");
 const { shell } = require("electron");
+const { protocol } = require("electron");
+
 
 //Main Window settings
 
@@ -28,7 +31,11 @@ function createMainWindow() {
       webSecurity: true,
     },
   });
-  mainWindow.loadURL("http://localhost:5173");
+  if (process.env.ELECTRON_START_URL) {
+    mainWindow.loadURL(process.env.ELECTRON_START_URL);
+  } else {
+    mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
+  }
 }
 
 //Utility for TitleBar
@@ -185,20 +192,23 @@ ipcMain.handle("get-pdf-base64", (event, examName, fileName) => {
   return buffer.toString("base64");
 });
 
-ipcMain.handle("rename-pdf-file", (event, examName, oldFileName, newFileName) => {
-  const dir = path.join(getExamsDir(), examName);
-  const oldPath = path.join(dir, oldFileName);
-  const newPath = path.join(dir, newFileName);
-  if (!fs.existsSync(oldPath)) return false;
-  if (fs.existsSync(newPath)) return false; // prevent overwrite
-  try {
-    fs.renameSync(oldPath, newPath);
-    return true;
-  } catch (e) {
-    console.error("Rename PDF error:", e);
-    return false;
+ipcMain.handle(
+  "rename-pdf-file",
+  (event, examName, oldFileName, newFileName) => {
+    const dir = path.join(getExamsDir(), examName);
+    const oldPath = path.join(dir, oldFileName);
+    const newPath = path.join(dir, newFileName);
+    if (!fs.existsSync(oldPath)) return false;
+    if (fs.existsSync(newPath)) return false; // prevent overwrite
+    try {
+      fs.renameSync(oldPath, newPath);
+      return true;
+    } catch (e) {
+      console.error("Rename PDF error:", e);
+      return false;
+    }
   }
-});
+);
 
 // Delete PDF file in exam folder
 ipcMain.handle("delete-pdf-file", (event, examName, fileName) => {
@@ -213,10 +223,26 @@ ipcMain.handle("delete-pdf-file", (event, examName, fileName) => {
   }
 });
 
+// AutoUpdater
+
+autoUpdater.on('update-available', () => {
+  console.log('[AutoUpdater] Update available');
+});
+autoUpdater.on('update-downloaded', () => {
+  console.log('[AutoUpdater] Update downloaded, will install on quit');
+});
+autoUpdater.on('error', (err) => {
+  console.error('[AutoUpdater] Error:', err);
+});
+
+
+
 //App Lyfecycle
 
 app.whenReady().then(() => {
+  autoUpdater.checkForUpdatesAndNotify();
   createMainWindow();
+ 
 });
 
 app.on("window-all-closed", () => {

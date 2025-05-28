@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import DefaultContainer from "../components/defaultContainter";
 import { Document, Page, pdfjs } from "react-pdf";
 import Spinner from "../components/spinner";
-import { useRef } from "react";
 import { ContextMenuComponent } from "@syncfusion/ej2-react-navigations";
 import "@syncfusion/ej2-base/styles/material.css";
 import "@syncfusion/ej2-icons/styles/material.css";
 import "@syncfusion/ej2-react-navigations/styles/material.css";
+import { useTheme } from "../components/themeProvider";
 
 // Configura il worker di PDF.js
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -28,6 +28,11 @@ export default function Slides() {
   const contextMenuRefs = useRef({});
   const [renameModal, setRenameModal] = useState({ open: false, oldName: "" });
   const [renameValue, setRenameValue] = useState("");
+  const { dark } = useTheme();
+
+  const buttonLight = "bg-[#6331c9] text-white hover:bg-[#7a4ed1]";
+  const buttonDark =
+    "bg-[#D2D6EF] text-[#181825] hover:bg-[#b8bce0] border border-[#D2D6EF]";
 
   const pdfMenuItems = [
     { text: "Rename", iconCss: "e-icons e-edit", id: "rename" },
@@ -36,7 +41,6 @@ export default function Slides() {
 
   useEffect(() => {
     if (!exam) return;
-    // Chiedi a Electron la lista dei PDF nella cartella dell'esame
     window.electron.invoke("list-pdf-files", exam).then((files) => {
       setPdfFiles(files || []);
       setRenderedCount(0);
@@ -49,18 +53,15 @@ export default function Slides() {
 
   useEffect(() => {
     if (pdfFiles.length > 0 && renderedCount >= pdfFiles.length) {
-      const timeout = setTimeout(() => setShowSpinner(false), 250); // 250ms di delay
+      const timeout = setTimeout(() => setShowSpinner(false), 250);
       return () => clearTimeout(timeout);
     }
   }, [renderedCount, pdfFiles.length]);
 
-  // Carica la preview della prima pagina per ogni PDF
   useEffect(() => {
     if (!pdfFiles.length) return;
-
     setPreviews({});
     setLoadingPreviews(new Set(pdfFiles));
-
     pdfFiles.forEach(async (file) => {
       try {
         const base64 = await window.electron.invoke(
@@ -69,18 +70,14 @@ export default function Slides() {
           file
         );
         if (base64) {
-          // Usa direttamente data URL invece di convertire manualmente
           const pdfUrl = `data:application/pdf;base64,${base64}`;
-
           setPreviews((prev) => ({
             ...prev,
             [file]: { url: pdfUrl, base64 },
           }));
-        } else {
-          console.error(`Failed to get base64 for ${file}`);
         }
       } catch (error) {
-        console.error(`Error loading preview for ${file}:`, error);
+        // eslint-disable-next-line
       } finally {
         setLoadingPreviews((prev) => {
           const newSet = new Set(prev);
@@ -98,12 +95,10 @@ export default function Slides() {
   }, [exam]);
 
   const handlePdfLoadError = (file, error) => {
-    console.error(`PDF Load Error for ${file}:`, error);
     setRenderedCount((prev) => prev + 1);
   };
 
   const handlePdfLoadSuccess = (file) => {
-    console.log(`PDF loaded successfully: ${file}`);
     setRenderedCount((prev) => prev + 1);
   };
 
@@ -184,7 +179,11 @@ export default function Slides() {
     <DefaultContainer className="overflow-hidden">
       <div className="overflow-hidden flex flex-col items-center mt-10">
         <button
-          className="cursor-pointer absolute left-10 top-16 flex items-center gap-2 bg-[#6331c9] text-white px-4 py-2 rounded-2xl hover:bg-[#7a4ed1] transition-colors duration-200"
+          className={`cursor-pointer absolute left-10 top-16 flex items-center gap-2 px-4 py-2 rounded-2xl transition-colors duration-200 ${
+            dark
+              ? "bg-[#D2D6EF] text-[#181825] hover:bg-[#b8bce0]"
+              : "bg-[#6331c9] text-white hover:bg-[#7a4ed1]"
+          }`}
           onClick={() => navigate(-1)}
         >
           <svg
@@ -203,12 +202,20 @@ export default function Slides() {
           </svg>
           Go Back
         </button>
-        <h1 className="text-4xl font-bold text-[#6331c9] mb-10 text-center">
+        <h1
+          className={`text-4xl font-bold mb-10 text-center ${
+            dark ? "text-[#D2D6EF]" : "text-[#6331c9]"
+          }`}
+        >
           {exam}
         </h1>
         <div className="absolute top-15 right-10">
           <button
-            className="flex items-center justify-center cursor-pointer bg-[#6331c9] text-white px-3 py-3 rounded-full hover:bg-[#7a4ed1]"
+            className={`flex items-center justify-center cursor-pointer px-3 py-3 rounded-full transition-colors ${
+              dark
+                ? "bg-[#D2D6EF] text-[#181825] hover:bg-[#b8bce0]"
+                : "bg-[#6331c9] text-white hover:bg-[#7a4ed1]"
+            }`}
             onClick={async () => {
               const filePath = await window.electron.invoke("open-pdf-dialog");
               if (!filePath) return;
@@ -236,24 +243,35 @@ export default function Slides() {
           </button>
         </div>
         {pdfFiles.length > 0 && renderedCount < pdfFiles.length && (
-          <div className="flex justify-center items-center w-full h-[100vh] z-50 absolute top-0 left-0 bg-[#D2D6EF]">
+          <div
+            className={`flex justify-center items-center w-full h-[100vh] z-50 absolute top-0 left-0 ${
+              dark ? "bg-[#181825]" : "bg-[#D2D6EF]"
+            }`}
+          >
             <Spinner />
           </div>
         )}
         <div className="flex flex-wrap gap-8 justify-center overflow-y-auto pb-18 z-10">
           {pdfFiles.length === 0 ? (
-            <span className="text-[#6331c9] text-lg font-semibold">
+            <span
+              className={`text-lg font-semibold ${
+                dark ? "text-[#D2D6EF]" : "text-[#6331c9]"
+              }`}
+            >
               No PDF files found in this exam.
             </span>
           ) : (
             [...pdfFiles]
               .sort((a, b) =>
-                a.localeCompare(b, undefined, { sensitivity: "base" })
+                a.localeCompare(b, undefined, {
+                  numeric: true,
+                  sensitivity: "base",
+                })
               )
               .map((file) => (
                 <div
                   key={file}
-                  className="flex flex-col items-center cursor-pointer  rounded-lg p-4  transition"
+                  className="flex flex-col items-center cursor-pointer rounded-lg p-4 transition"
                   onContextMenu={(e) => handlePdfContextMenu(e, file)}
                   onClick={() =>
                     navigate("/pdfViewer", { state: { exam, file } })
@@ -287,7 +305,11 @@ export default function Slides() {
                       <span className="text-red-400">Failed to load</span>
                     )}
                   </div>
-                  <span className="mt-2 text-[#6331c9] font-semibold text-center break-all">
+                  <span
+                    className={`mt-2 font-semibold text-center break-all ${
+                      dark ? "text-[#D2D6EF]" : "text-[#6331c9]"
+                    }`}
+                  >
                     {trimFileName(file)}
                   </span>
                   <ContextMenuComponent
@@ -303,8 +325,16 @@ export default function Slides() {
       </div>
       {renameModal.open && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg flex flex-col items-center">
-            <h2 className="mb-4 text-lg font-bold text-[#6331c9]">
+          <div
+            className={`p-6 rounded-xl shadow-lg flex flex-col items-center ${
+              dark ? "bg-[#181825]" : "bg-white"
+            }`}
+          >
+            <h2
+              className={`mb-4 text-lg font-bold ${
+                dark ? "text-[#D2D6EF]" : "text-[#6331c9]"
+              }`}
+            >
               Rename PDF file
             </h2>
             <input
@@ -312,17 +342,25 @@ export default function Slides() {
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}
               placeholder="New name"
-              className="border px-3 py-2 rounded mb-4 w-64"
+              className={`border px-3 py-2 rounded mb-4 w-64 ${
+                dark ? "bg-[#232336] text-white border-[#6331c9]" : ""
+              }`}
             />
             <div className="flex gap-2">
               <button
-                className="cursor-pointer hover:bg-[#7a4ed1]  bg-[#6331c9] text-white px-4 py-2 rounded-2xl"
+                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${
+                  dark ? buttonDark : buttonLight
+                }`}
                 onClick={confirmRename}
               >
                 Rename
               </button>
               <button
-                className="cursor-pointer hover:bg-[#7a4ed1] bg-gray-300 text-[#6331c9] px-4 py-2 rounded-2xl"
+                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${
+                  dark
+                    ? "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]"
+                    : "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]"
+                }`}
                 onClick={() => setRenameModal({ open: false, oldName: "" })}
               >
                 Cancel
