@@ -3,9 +3,9 @@
 </p>
 <h1 align="center">ExamShelf</h1>
 
-![version](https://img.shields.io/badge/version-1.0.4-blue)
+![version](https://img.shields.io/badge/version-1.0.5-blue)
 
->🎉 **Release 1.0.4** is now available! 
+>🎉 **Release 1.0.5** is now available! 
 
 **ExamShelf** is a desktop application to help students and learners manage their exam materials. It allows you to upload, view, and organize PDFs such as slides and handouts, all in a clean, minimal interface built with Material UI.
 
@@ -23,7 +23,7 @@
 
 ## 🚀 Installation
 
-Head to the [Releases](https://github.com/nothowstorygoes/Notes-In/releases) section and download the latest installer (available on for Windows).
+Head to the [Releases](https://github.com/nothowstorygoes/ExamShelf/releases) section and download the latest installer (available on for Windows).
 
 ⚠️ There is **no `npm install` needed** — this is a standalone desktop application.
 
