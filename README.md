@@ -23,7 +23,7 @@
 
 ## 🚀 Installation
 
-Head to the [Releases](https://github.com/nothowstorygoes/Notes-In/releases) section and download the latest installer (available on for Windows).
+Head to the [Releases](https://github.com/nothowstorygoes/ExamShelf/releases) section and download the latest installer (available on for Windows).
 
 ⚠️ There is **no `npm install` needed** — this is a standalone desktop application.
 
