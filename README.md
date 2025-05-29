@@ -1,13 +1,13 @@
 <p align="center">
   <img src="https://github.com/user-attachments/assets/13ec4f90-63f7-4de0-af76-355649fadc9c" alt="App Icon" width="120" />
 </p>
-<h1 align="center">Notes In</h1>
+<h1 align="center">ExamShelf</h1>
 
 ![version](https://img.shields.io/badge/version-1.0.4-blue)
 
 >🎉 **Release 1.0.4** is now available! 
 
-**Notes In** is a desktop application to help students and learners manage their exam materials. It allows you to upload, view, and organize PDFs such as slides and handouts, all in a clean, minimal interface built with Material UI.
+**ExamShelf** is a desktop application to help students and learners manage their exam materials. It allows you to upload, view, and organize PDFs such as slides and handouts, all in a clean, minimal interface built with Material UI.
 
 ## ✨ Features
 
