@@ -59,7 +59,7 @@ export default function Landing() {
             </div>
             {!integration ? (
                 <p className='text-[#6331c9] text-center absolute bottom-2 w-120'>
-                    <b>Notes In</b> is part of <b>Ergo Ecosystem</b>, check out{" "}
+                    <b>ExamShelf</b> is part of <b>Ergo Ecosystem</b>, check out{" "}
                     <a
                         href="#"
                         onClick={e => {

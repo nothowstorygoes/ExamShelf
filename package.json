@@ -1,7 +1,7 @@
 {
   "name": "examshelf",
   "private": true,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "module",
   "main": "electron/main.cjs",
   "author": "nothowstorygoes",
@@ -43,7 +43,7 @@
     "vite-plugin-electron-renderer": "^0.14.6"
   },
   "build": {
-    "appId": "com.notesIn.app",
+    "appId": "com.examShelf.app",
     "productName": "ExamShelf",
     "asar": true,
     "publish": [
@@ -87,7 +87,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Notes In",
+      "shortcutName": "ExamShelf",
       "installerIcon": "assets/icon.ico",
       "uninstallerIcon": "assets/icon.ico",
       "deleteAppDataOnUninstall": true,
