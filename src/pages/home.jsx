@@ -28,6 +28,7 @@ export default function Home() {
     setShowModal(false);
     await window.electron.invoke("save-exams-json", updatedExams);
     await window.electron.invoke("create-exam-folder", examName.trim());
+    await window.electron.invoke("create-exam-json", examName.trim());
   };
 
   // Elimina esame dal json e cartella
@@ -67,9 +68,9 @@ export default function Home() {
 
   return (
     <DefaultContainer className="relative">
-      <div className="absolute top-20 right-10 flex md:flex-row lg:flex-col gap-10 items-center justify-center">
+      <div className="absolute top-20 right-10 w-40 flex md:flex-row lg:flex-col gap-10 items-center justify-center">
         <button
-          className={`z-50 cursor-pointer px-3 py-3 rounded-full text-3xl transition-colors duration-300 ${
+          className={`z-50 cursor-pointer px-3 py-3 md:hover:px-8 lg:hover:px-3 lg:hover:py-6 rounded-full text-3xl transition-all duration-300 ${
             dark ? buttonDark : buttonLight
           }`}
           onClick={() => setShowModal(true)}
@@ -79,7 +80,7 @@ export default function Home() {
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-            strokeWidth={1.5}
+            strokeWidth={2}
             stroke="currentColor"
             className="w-6 h-6"
           >
@@ -91,7 +92,7 @@ export default function Home() {
           </svg>
         </button>
         <button
-          className={`z-50 cursor-pointer px-3 py-3 rounded-full text-3xl transition-colors duration-300 ${
+          className={`z-50 cursor-pointer px-3 py-3 rounded-full text-3xl md:hover:px-8 lg:hover:px-3 lg:hover:py-6 transition-all duration-300 ${
             dark ? buttonDark : buttonLight
           }`}
           onClick={() => navigate("/settings")}
@@ -101,7 +102,7 @@ export default function Home() {
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-            strokeWidth={1.5}
+            strokeWidth={2}
             stroke="currentColor"
             className="w-6 h-6"
           >
@@ -119,7 +120,9 @@ export default function Home() {
         </button>
       </div>
       <div className="flex items-center justify-center w-full absolute top-20 mx-auto">
-        <h1 className="text-5xl text-[#6331c9] dark:text-[#D2D6EF]">Your Exams</h1>
+        <h1 className="text-5xl text-[#6331c9] dark:text-[#D2D6EF]">
+          Your Exams
+        </h1>
       </div>
       <div className="flex flex-wrap gap-6 mt-6 items-center justify-center">
         {exams.length === 0 ? (
@@ -141,8 +144,16 @@ export default function Home() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
-          <div className={`p-6 rounded-xl shadow-lg flex flex-col items-center ${dark ? "bg-[#181825]" : "bg-white"}`}>
-            <h2 className={`mb-4 text-lg font-bold ${dark ? "text-[#D2D6EF]" : "text-[#6331c9]"}`}>
+          <div
+            className={`p-6 rounded-xl shadow-lg flex flex-col items-center ${
+              dark ? "bg-[#181825]" : "bg-white"
+            }`}
+          >
+            <h2
+              className={`mb-4 text-lg font-bold ${
+                dark ? "text-[#D2D6EF]" : "text-[#6331c9]"
+              }`}
+            >
               Create new exam folder
             </h2>
             <input
@@ -150,17 +161,25 @@ export default function Home() {
               value={examName}
               onChange={(e) => setExamName(e.target.value)}
               placeholder="Name"
-              className={`border px-3 py-2 rounded mb-4 w-64 ${dark ? "bg-[#232336] text-white border-[#6331c9]" : ""}`}
+              className={`border px-3 py-2 rounded mb-4 w-64 ${
+                dark ? "bg-[#232336] text-white border-[#6331c9]" : ""
+              }`}
             />
             <div className="flex gap-2">
               <button
-                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${dark ? buttonDark : buttonLight}`}
+                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${
+                  dark ? buttonDark : buttonLight
+                }`}
                 onClick={handleAddExam}
               >
                 Add
               </button>
               <button
-                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${dark ? "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]" : "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]"}`}
+                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${
+                  dark
+                    ? "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]"
+                    : "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]"
+                }`}
                 onClick={() => setShowModal(false)}
               >
                 Cancel
@@ -171,8 +190,16 @@ export default function Home() {
       )}
       {renameModal.open && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
-          <div className={`p-6 rounded-xl shadow-lg flex flex-col items-center ${dark ? "bg-[#181825]" : "bg-white"}`}>
-            <h2 className={`mb-4 text-lg font-bold ${dark ? "text-[#D2D6EF]" : "text-[#6331c9]"}`}>
+          <div
+            className={`p-6 rounded-xl shadow-lg flex flex-col items-center ${
+              dark ? "bg-[#181825]" : "bg-white"
+            }`}
+          >
+            <h2
+              className={`mb-4 text-lg font-bold ${
+                dark ? "text-[#D2D6EF]" : "text-[#6331c9]"
+              }`}
+            >
               Rename exam folder
             </h2>
             <input
@@ -180,17 +207,25 @@ export default function Home() {
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}
               placeholder="New name"
-              className={`border px-3 py-2 rounded mb-4 w-64 ${dark ? "bg-[#232336] text-white border-[#6331c9]" : ""}`}
+              className={`border px-3 py-2 rounded mb-4 w-64 ${
+                dark ? "bg-[#232336] text-white border-[#6331c9]" : ""
+              }`}
             />
             <div className="flex gap-2">
               <button
-                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${dark ? buttonDark : buttonLight}`}
+                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${
+                  dark ? buttonDark : buttonLight
+                }`}
                 onClick={confirmRename}
               >
                 Rename
               </button>
               <button
-                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${dark ? "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]" : "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]"}`}
+                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${
+                  dark
+                    ? "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]"
+                    : "bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]"
+                }`}
                 onClick={() => setRenameModal({ open: false, oldName: "" })}
               >
                 Cancel

@@ -1,33 +1,46 @@
 import DefaultContainer from "../components/defaultContainter";
 import { useTheme } from "../components/themeProvider";
 import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 
 export default function Settings() {
   const navigate = useNavigate();
   const { dark, toggleTheme } = useTheme();
+  const [appVersion, setAppVersion] = useState("");
+
   const buttonLight = "bg-[#6331c9] text-white hover:bg-[#4b2496]";
   const buttonDark =
     "bg-[#D2D6EF] text-[#181825] hover:bg-[#b8bce0] border border-[#D2D6EF]";
 
+  useEffect(() => {
+    window.electron
+      .getAppVersion()
+      .then((version) => setAppVersion(version || "Unknown"));
+  }, []);
+
   return (
     <DefaultContainer className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className={`text-2xl font-bold mb-10 ${dark ? "text-[#D2D6EF]" : "text-[#6331c9]"}`}>
+      <h1
+        className={`text-2xl font-bold mb-10 ${
+          dark ? "text-[#D2D6EF]" : "text-[#6331c9]"
+        }`}
+      >
         Settings
       </h1>
       <button
         aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
         className={`cursor-pointer p-2 rounded-full border-2 transition-colors duration-200 mb-10 ${
           dark
-            ? "border-[#6331c9] bg-[#181825]"
-            : "border-[#6331c9] bg-[#f5f5fa]"
+            ? "border-[#D2D6EF] bg-[#181825]"
+            : "border-[#6331c9] bg-[#D2D6EF]"
         }`}
         onClick={() => toggleTheme(!dark)}
       >
         {dark ? (
           // Sun SVG for switching to light mode
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="5" fill="#6331c9" />
-            <g stroke="#6331c9" strokeWidth="2" strokeLinecap="round">
+            <circle cx="12" cy="12" r="5" fill="#D2D6EF" />
+            <g stroke="#D2D6EF" strokeWidth="2" strokeLinecap="round">
               <line x1="12" y1="2" x2="12" y2="4" />
               <line x1="12" y1="20" x2="12" y2="22" />
               <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
@@ -48,8 +61,11 @@ export default function Settings() {
           </svg>
         )}
       </button>
+      <div className="absolute top-110 mx-auto text-sm text-[#6331c9] dark:text-[#D2D6EF]">
+        v.{appVersion}
+      </div>
       <button
-        className={`rounded-3xl w-35 h-10 font-semibold hover:w-40 cursor-pointer transition-all duration-300 ${
+        className={`rounded-3xl w-35 h-10 font-semibold hover:w-50 cursor-pointer transition-all duration-300 ${
           dark ? buttonDark : buttonLight
         }`}
         onClick={() => navigate(-1)}
