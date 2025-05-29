@@ -11,7 +11,7 @@ const { protocol } = require("electron");
 const customUserDataPath = path.join(
   app.getPath("appData"),
   "Ergo",
-  "Notes In"
+  "ExamShelf"
 );
 const CogitoUserDataPath = path.join(app.getPath("appData"), "Ergo", "Cogito");
 app.setPath("userData", customUserDataPath);
@@ -230,6 +230,7 @@ autoUpdater.on('update-available', () => {
 });
 autoUpdater.on('update-downloaded', () => {
   console.log('[AutoUpdater] Update downloaded, will install on quit');
+  autoUpdater.quitAndInstall();
 });
 autoUpdater.on('error', (err) => {
   console.error('[AutoUpdater] Error:', err);

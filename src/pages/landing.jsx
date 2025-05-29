@@ -28,7 +28,7 @@ export default function Landing() {
             "https://raw.githubusercontent.com/akzhy/Vara/master/fonts/Satisfy/SatisfySL.json",
             [
                 {
-                    text: "Welcome to Notes In",
+                    text: "Welcome to ExamShelf",
                     textAlign: "center",
                     y: 20,
                     fromCurrentPosition: { y: false },
