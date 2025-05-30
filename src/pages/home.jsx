@@ -20,46 +20,67 @@ export default function Home() {
     });
   }, []);
 
-  const handleAddExam = async () => {
-    if (examName.trim() === "") return;
-    const updatedExams = [...exams, examName.trim()];
-    setExams(updatedExams);
-    setExamName("");
-    setShowModal(false);
-    await window.electron.invoke("save-exams-json", updatedExams);
-    await window.electron.invoke("create-exam-folder", examName.trim());
-    await window.electron.invoke("create-exam-json", examName.trim());
-  };
+const handleAddExam = async () => {
+  if (examName.trim() === "") return;
+  const updatedExams = [
+    ...exams.map(e => typeof e === "string" ? { name: e } : e),
+    { name: examName.trim() , color: "Purple" }
+  ];
+  setExams(updatedExams);
+  setExamName("");
+  setShowModal(false);
+  await window.electron.invoke("save-exams-json", updatedExams);
+  await window.electron.invoke("create-exam-folder", examName.trim());
+  await window.electron.invoke("create-exam-json", examName.trim());
+};
 
-  // Elimina esame dal json e cartella
-  const handleDeleteExam = async (examToDelete) => {
-    const updatedExams = exams.filter((exam) => exam !== examToDelete);
-    setExams(updatedExams);
-    await window.electron.invoke("save-exams-json", updatedExams);
-    await window.electron.invoke("delete-exam-folder", examToDelete);
-  };
+const handleDeleteExam = async (examToDelete) => {
+  const updatedExams = exams
+    .map(e => typeof e === "string" ? { name: e } : e)
+    .filter((exam) => exam.name !== examToDelete);
+  setExams(updatedExams);
+  await window.electron.invoke("save-exams-json", updatedExams);
+  await window.electron.invoke("delete-exam-folder", examToDelete);
+};
 
-  const confirmRename = async () => {
-    const newName = renameValue.trim();
-    if (!newName || newName === renameModal.oldName) return;
-    await window.electron.invoke(
-      "rename-exam-folder",
-      renameModal.oldName,
-      newName
-    );
-    const updatedExams = exams.map((exam) =>
-      exam === renameModal.oldName ? newName : exam
-    );
-    setExams(updatedExams);
-    setRenameModal({ open: false, oldName: "" });
-    setRenameValue("");
-    await window.electron.invoke("save-exams-json", updatedExams);
-  };
+const confirmRename = async () => {
+  const newName = renameValue.trim();
+  if (!newName || newName === renameModal.oldName) return;
+  await window.electron.invoke(
+    "rename-exam-folder",
+    renameModal.oldName,
+    newName
+  );
+  const updatedExams = exams.map((exam) => {
+    const obj = typeof exam === "string" ? { name: exam } : exam;
+    if (obj.name === renameModal.oldName) {
+      return { ...obj, name: newName };
+    }
+    return obj;
+  });
+  setExams(updatedExams);
+  setRenameModal({ open: false, oldName: "" });
+  setRenameValue("");
+  await window.electron.invoke("save-exams-json", updatedExams);
+};
 
   const handleRenameExam = (oldExamName) => {
     setRenameModal({ open: true, oldName: oldExamName });
     setRenameValue(oldExamName);
   };
+
+const handleColorExam = async (examName, colorName) => {
+  const data = await window.electron.invoke("load-exams-json");
+  if (!Array.isArray(data)) return;
+  const normalized = data.map((item) =>
+    typeof item === "string" ? { name: item } : item
+  );
+  const updatedExams = normalized.map((item) =>
+    item.name === examName ? { ...item, color: colorName } : item
+  );
+  await window.electron.invoke("save-exams-json", updatedExams);
+  setExams(updatedExams);
+};
 
   // Palette come settings.jsx
   const buttonLight = "bg-[#6331c9] text-white hover:bg-[#4b2496]";
@@ -136,6 +157,7 @@ export default function Home() {
               exam={exam}
               onDelete={handleDeleteExam}
               onRename={handleRenameExam}
+              onColor={handleColorExam}
             />
           ))
         )}
