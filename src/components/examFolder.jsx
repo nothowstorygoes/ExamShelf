@@ -14,7 +14,7 @@ export default function ExamFolder({ exam, onRename, onDelete, onColor }) {
   const { dark } = useTheme();
 
 const colorOptions = [
-  { id: "Purple", base: "#6331c9", accent: "#D2D6EF" },      // viola chiaro
+  { id: "Purple", base: "#6331c9", accent: "#abb4ed" },      // viola chiaro
   { id: "Red", base: "#e63946", accent: "#ffb3b3" },         // rosso chiaro
   { id: "Blue", base: "#457b9d", accent: "#a8dadc" },        // azzurro chiaro
   { id: "Orange", base: "#f4a261", accent: "#ffe0b2" },      // arancione chiaro

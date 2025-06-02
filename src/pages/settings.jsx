@@ -7,6 +7,8 @@ export default function Settings() {
   const navigate = useNavigate();
   const { dark, toggleTheme } = useTheme();
   const [appVersion, setAppVersion] = useState("");
+    const [integrationActive, setIntegrationActive] = useState(null);
+
 
   const buttonLight = "bg-[#6331c9] text-white hover:bg-[#4b2496]";
   const buttonDark =
@@ -16,6 +18,14 @@ export default function Settings() {
     window.electron
       .getAppVersion()
       .then((version) => setAppVersion(version || "Unknown"));
+  }, []);
+
+  useEffect(() => {
+    window.electron.getAppVersion()
+      .then((version) => setAppVersion(version || "Unknown"));
+    // Controlla integrazione Cogito
+    window.electron.invoke("get-exam-integration-data")
+      .then((exists) => setIntegrationActive(!!exists));
   }, []);
 
   return (
@@ -61,7 +71,15 @@ export default function Settings() {
           </svg>
         )}
       </button>
-      <div className="absolute top-110 mx-auto text-sm text-[#6331c9] dark:text-[#D2D6EF]">
+      {integrationActive !== null && (
+        <div className={`mb-10 w-60 text-center font-semibold text-[#6331c9] dark:text-[#D2D6EF]`}>
+          {integrationActive
+            ? "Ergo's Integration is active"
+            : "Ergo's Integration is disabled, to enable it use Cogito."
+          }
+        </div>
+      )}
+      <div className="mx-auto text-sm text-[#6331c9] dark:text-[#D2D6EF] mb-10">
         v.{appVersion}
       </div>
       <button

@@ -43,7 +43,7 @@ export default function Slides() {
   const buttonDark =
     "bg-[#D2D6EF] text-[#181825] hover:bg-[#b8bce0] border border-[#D2D6EF]";
 
- const pdfMenuItems = [
+  const pdfMenuItems = [
     {
       text: (file) => {
         const meta = examJson.find((obj) => obj.file === file);
@@ -75,8 +75,8 @@ export default function Slides() {
   ];
 
   useEffect(() => {
-  setRenderedCount(0);
-}, [pdfFiles]);
+    setRenderedCount(0);
+  }, [pdfFiles]);
 
   useEffect(() => {
     if (!exam) return;
@@ -97,36 +97,36 @@ export default function Slides() {
     }
   }, [renderedCount, pdfFiles.length]);
 
-useEffect(() => {
-  if (!pdfFiles.length) return;
-  setPreviews({});
-  setLoadingPreviews(new Set(pdfFiles));
-  pdfFiles.forEach(async (file) => {
-    try {
-      const base64 = await window.electron.invoke(
-        "get-pdf-base64",
-        exam,
-        file
-      );
-      if (base64) {
-        const pdfUrl = `data:application/pdf;base64,${base64}`;
-        setPreviews((prev) => ({
-          ...prev,
-          [file]: { url: pdfUrl, base64 },
-        }));
+  useEffect(() => {
+    if (!pdfFiles.length) return;
+    setPreviews({});
+    setLoadingPreviews(new Set(pdfFiles));
+    pdfFiles.forEach(async (file) => {
+      try {
+        const base64 = await window.electron.invoke(
+          "get-pdf-base64",
+          exam,
+          file
+        );
+        if (base64) {
+          const pdfUrl = `data:application/pdf;base64,${base64}`;
+          setPreviews((prev) => ({
+            ...prev,
+            [file]: { url: pdfUrl, base64 },
+          }));
+        }
+      } catch (error) {
+        // eslint-disable-next-line
+      } finally {
+        setLoadingPreviews((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(file);
+          return newSet;
+        });
+        setRenderedCount((prev) => prev + 1); // <-- aggiungi qui!
       }
-    } catch (error) {
-      // eslint-disable-next-line
-    } finally {
-      setLoadingPreviews((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(file);
-        return newSet;
-      });
-      setRenderedCount((prev) => prev + 1); // <-- aggiungi qui!
-    }
-  });
-}, [pdfFiles, exam]);
+    });
+  }, [pdfFiles, exam]);
 
   useEffect(() => {
     if (!exam) return;
@@ -134,7 +134,7 @@ useEffect(() => {
     // eslint-disable-next-line
   }, [exam]);
 
-   const handlePdfMenuClick = async (args, file) => {
+  const handlePdfMenuClick = async (args, file) => {
     const metaIdx = examJson.findIndex((obj) => obj.file === file);
     if (args.item.id === "pin-toggle") {
       if (metaIdx !== -1) {
@@ -189,7 +189,7 @@ useEffect(() => {
     }
   };
 
-    function trimPreviewFileName(file) {
+  function trimPreviewFileName(file) {
     let name = file.replace(/\.pdf$/i, "");
     if (name.length > 14) {
       name = name.slice(0, 14) + "...";
@@ -339,52 +339,52 @@ useEffect(() => {
           </h1>
           {/* View Hidden Button */}
           <div className="w-40 flex justify-end gap-4">
-          <button
-            className={`flex items-center justify-center cursor-pointer px-3 py-3 hover:px-8 rounded-full transition-all ${
-              dark
-                ? "bg-[#D2D6EF] text-[#181825] hover:bg-[#b8bce0]"
-                : "bg-[#6331c9] text-white hover:bg-[#7a4ed1]"
-            }`}
-            onClick={() => setShowHidden((prev) => !prev)}
-            aria-label={showHidden ? "Hide hidden PDFs" : "View hidden PDFs"}
-            title={showHidden ? "Hide hidden PDFs" : "View hidden PDFs"}
-            type="button"
-          >
-            {showHidden ? (
-              // Eye open SVG
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.25 12s3.75-7.5 9.75-7.5 9.75 7.5 9.75 7.5-3.75 7.5-9.75 7.5S2.25 12 2.25 12z"
-                />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            ) : (
-              // Eye closed SVG
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3.98 8.223A10.477 10.477 0 002.25 12s3.75 7.5 9.75 7.5c2.042 0 3.93-.488 5.57-1.277M21.75 12c-.621-1.293-1.507-2.727-2.73-4.027M9.53 9.53a3 3 0 014.24 4.24m-4.24-4.24L3 3m6.53 6.53L21 21"
-                />
-              </svg>
-            )}
-          </button>
+            <button
+              className={`flex items-center justify-center cursor-pointer px-3 py-3 hover:px-8 rounded-full transition-all ${
+                dark
+                  ? "bg-[#D2D6EF] text-[#181825] hover:bg-[#b8bce0]"
+                  : "bg-[#6331c9] text-white hover:bg-[#7a4ed1]"
+              }`}
+              onClick={() => setShowHidden((prev) => !prev)}
+              aria-label={showHidden ? "Hide hidden PDFs" : "View hidden PDFs"}
+              title={showHidden ? "Hide hidden PDFs" : "View hidden PDFs"}
+              type="button"
+            >
+              {showHidden ? (
+                // Eye open SVG
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.25 12s3.75-7.5 9.75-7.5 9.75 7.5 9.75 7.5-3.75 7.5-9.75 7.5S2.25 12 2.25 12z"
+                  />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              ) : (
+                // Eye closed SVG
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3.98 8.223A10.477 10.477 0 002.25 12s3.75 7.5 9.75 7.5c2.042 0 3.93-.488 5.57-1.277M21.75 12c-.621-1.293-1.507-2.727-2.73-4.027M9.53 9.53a3 3 0 014.24 4.24m-4.24-4.24L3 3m6.53 6.53L21 21"
+                  />
+                </svg>
+              )}
+            </button>
             <button
               className={`flex items-center justify-center cursor-pointer px-3 py-3 hover:px-8  rounded-full transition-all ${
                 dark
@@ -422,7 +422,7 @@ useEffect(() => {
             <Spinner />
           </div>
         )}
-        <div className="mt-40 flex flex-wrap gap-8 justify-center overflow-y-auto pb-18 z-10">
+        <div className="mt-40 flex flex-wrap p-10 gap-8 justify-center overflow-y-auto custom-scrollbar pb-18 z-10">
           {pdfFiles.length === 0 ? (
             <span
               className={`text-lg font-semibold ${
@@ -432,7 +432,7 @@ useEffect(() => {
               No PDF files found in this exam.
             </span>
           ) : (
-             [...pdfFiles]
+            [...pdfFiles]
               .filter((file) => {
                 const meta = examJson.find((obj) => obj.file === file);
                 // Se showHidden è attivo, mostra tutti i file (sia hidden che non)
@@ -631,6 +631,26 @@ useEffect(() => {
           </div>
         </div>
       )}
+      <style>
+        {`
+    .custom-scrollbar {
+      scrollbar-width: thin;
+      margin-right: 20px;
+      scrollbar-color: ${dark ? "#D2D6EF #181825" : "#6331c9 #D2D6EF"};
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+      background: ${dark ? "#181825" : "#D2D6EF"};
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: ${dark ? "#D2D6EF" : "#6331c9"};
+      border-radius: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: ${dark ? "#b8bce0" : "#4b2496"};
+    }
+  `}
+      </style>
     </DefaultContainer>
   );
 }

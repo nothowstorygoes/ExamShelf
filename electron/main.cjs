@@ -94,6 +94,12 @@ ipcMain.handle("set-onboarding-data", (event, data) =>
 function getCogitoPath() {
   return path.join(CogitoUserDataPath, "onboarding.json");
 }
+
+function getExamIntegrationPath() {
+  return path.join(CogitoUserDataPath, "ExamIntegration.json");
+}
+ipcMain.handle("get-exam-integration-data", () =>
+  readJson(getExamIntegrationPath()));
 ipcMain.handle("get-cogito-data", () => readJson(getCogitoPath()));
 ipcMain.handle("open-external", (event, url) => {
   shell.openExternal(url);
