@@ -3,7 +3,7 @@
 </p>
 <h1 align="center">ExamShelf</h1>
 
->🎉 **Release 1.1.2** is now available! 
+>🎉 **Release 1.1.3** is now available! 
 
 **ExamShelf** is a desktop application to help students and learners manage their exam materials. It allows you to upload, view, and organize PDFs such as slides and handouts, all in a clean, minimal interface built with Material UI.
 
