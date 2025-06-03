@@ -9,7 +9,6 @@ import { useState } from "react";
 export default function Landing() {
   const navigate = useNavigate();
   const [integration, setIntegration] = useState(false);
-  const [temp, setTemp] = useState(false);
   useEffect(() => {
     window.electron.invoke("get-onboarding-data").then((res) => {
       if (res) {
@@ -83,12 +82,6 @@ export default function Landing() {
         </p>
       ) : (
         <div className="flex items-center justify-center absolute bottom-2 w-120">
-          <input
-            type="checkbox"
-            className="mr-2"
-            checked={temp}
-            onChange={(e) => setTemp(e.target.checked)} // aggiorna temp
-          />
           <label className="text-[#6331c9]">
             Use ergo's integration system with Cogito
           </label>

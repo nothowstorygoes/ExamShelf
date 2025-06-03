@@ -8,31 +8,6 @@ export default function GetStarted() {
   const [error, setError] = useState("");
   const [name, setName] = useState("");
   const [showButton, setShowButton] = useState(false);
-  const userchoice = useLocation().state.temp;
-
-  useEffect(() => {
-    if (userchoice) {
-      window.electron.invoke("get-cogito-data").then((res) => {
-        if (res) {
-          const autoSet = () => {
-            setError("");
-            window.electron
-              .invoke("set-onboarding-data", {
-                name: res.name || "",
-                onboarded: true,
-                dark: res.dark || false,
-                ergoIntegration: true,
-                propic: res.propic || "/assets/empty.png",
-              })
-              .then(() => {
-                navigate("/home");
-              });
-          };
-          autoSet();
-        }
-      });
-    }
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
