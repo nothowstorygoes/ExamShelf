@@ -36,8 +36,12 @@ export default function Slides() {
   const [addModal, setAddModal] = useState({ open: false, filePath: null });
   const [addPin, setAddPin] = useState(false);
   const [addTag, setAddTag] = useState("slides");
+    const [tagFilter, setTagFilter] = useState("all");
+
   const [addFileName, setAddFileName] = useState("");
   const [addPreviewUrl, setAddPreviewUrl] = useState("");
+  const [bulkModal, setBulkModal] = useState({ open: false, files: [] });
+  const [deleteModal, setDeleteModal] = useState({ open: false, file: null });
 
   const buttonLight = "bg-[#6331c9] text-white hover:bg-[#7a4ed1]";
   const buttonDark =
@@ -170,23 +174,23 @@ export default function Slides() {
       return;
     }
     if (args.item.id === "delete") {
-      if (window.confirm(`Delete "${file}"?`)) {
-        const success = await window.electron.invoke(
-          "delete-pdf-file",
-          exam,
-          file
-        );
-        if (success) {
-          // Remove from examJson as well
-          const updated = examJson.filter((obj) => obj.file !== file);
-          await window.electron.invoke("set-exam-json", exam, updated);
-          setExamJson(updated);
-          await refreshPdfFiles();
-        } else {
-          alert("Delete failed.");
-        }
-      }
+      setDeleteModal({ open: true, file });
     }
+  };
+
+  const confirmDeletePdf = async () => {
+    const file = deleteModal.file;
+    if (!file) return;
+    const success = await window.electron.invoke("delete-pdf-file", exam, file);
+    if (success) {
+      const updated = examJson.filter((obj) => obj.file !== file);
+      await window.electron.invoke("set-exam-json", exam, updated);
+      setExamJson(updated);
+      await refreshPdfFiles();
+    } else {
+      alert("Delete failed.");
+    }
+    setDeleteModal({ open: false, file: null });
   };
 
   function trimPreviewFileName(file) {
@@ -259,19 +263,45 @@ export default function Slides() {
 
   // --- Nuova logica per aggiunta PDF con modal ---
   const handleAddPdf = async () => {
-    const filePath = await window.electron.invoke("open-pdf-dialog");
-    if (!filePath) return;
-    const fileName = filePath.split(/[\\/]/).pop();
-    setAddFileName(fileName);
-    setAddPin(false);
-    setAddTag("slides");
-    // Ottieni preview base64 temporanea
-    const base64 = await window.electron.invoke(
-      "get-pdf-base64-from-path",
-      filePath
-    );
-    if (base64) setAddPreviewUrl(`data:application/pdf;base64,${base64}`);
-    setAddModal({ open: true, filePath });
+    const filePaths = await window.electron.invoke("open-pdf-dialog-multi");
+    if (!filePaths || filePaths.length === 0) return;
+    if (filePaths.length === 1) {
+      // Comportamento singolo file (come prima)
+      const filePath = filePaths[0];
+      const fileName = filePath.split(/[\\/]/).pop();
+      setAddFileName(fileName);
+      setAddPin(false);
+      setAddTag("slides");
+      const base64 = await window.electron.invoke(
+        "get-pdf-base64-from-path",
+        filePath
+      );
+      if (base64) setAddPreviewUrl(`data:application/pdf;base64,${base64}`);
+      setAddModal({ open: true, filePath });
+    } else {
+      // Bulk upload
+      setBulkModal({ open: true, files: filePaths });
+    }
+  };
+
+  const confirmBulkAddPdf = async () => {
+    const pdfObjs = [];
+    for (const filePath of bulkModal.files) {
+      const fileName = filePath.split(/[\\/]/).pop();
+      // Copia PDF nella cartella esame
+      await window.electron.invoke("add-pdf-to-exam", exam, filePath);
+      pdfObjs.push({
+        file: fileName,
+        pinned: false,
+        tag: "slides",
+        hidden: false,
+      });
+    }
+    const updated = [...examJson, ...pdfObjs];
+    await window.electron.invoke("set-exam-json", exam, updated);
+    setExamJson(updated);
+    setBulkModal({ open: false, files: [] });
+    await refreshPdfFiles();
   };
 
   const confirmAddPdf = async () => {
@@ -339,6 +369,22 @@ export default function Slides() {
           </h1>
           {/* View Hidden Button */}
           <div className="w-40 flex justify-end gap-4">
+             <div className="flex items-center gap-2">
+              <select
+                className={`rounded-xl px-2 py-3 border text-sm ${
+                  dark
+                    ? "bg-[#232336] text-[#D2D6EF] border-[#D2D6EF]"
+                    : "bg-white text-[#6331c9] border-[#6331c9]"
+                }`}
+                value={tagFilter}
+                onChange={e => setTagFilter(e.target.value)}
+                title="Filter by tag"
+              >
+                <option value="all">All tags</option>
+                <option value="slides">Slides</option>
+                <option value="book">Book</option>
+              </select>
+            </div>
             <button
               className={`flex items-center justify-center cursor-pointer px-3 py-3 hover:px-8 rounded-full transition-all ${
                 dark
@@ -411,6 +457,7 @@ export default function Slides() {
                 />
               </svg>
             </button>
+            
           </div>
         </div>
         {pdfFiles.length > 0 && renderedCount < pdfFiles.length && (
@@ -433,10 +480,11 @@ export default function Slides() {
             </span>
           ) : (
             [...pdfFiles]
-              .filter((file) => {
+               .filter((file) => {
                 const meta = examJson.find((obj) => obj.file === file);
-                // Se showHidden è attivo, mostra tutti i file (sia hidden che non)
-                // Se showHidden è false, mostra solo quelli non hidden
+                // Tag filter
+                if (tagFilter !== "all" && meta?.tag !== tagFilter) return false;
+                // ShowHidden logic
                 if (showHidden) return true;
                 return !meta?.hidden;
               })
@@ -624,6 +672,89 @@ export default function Slides() {
                 }}`
                 }`}
                 onClick={() => setRenameModal({ open: false, oldName: "" })}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {bulkModal.open && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
+          <div
+            className={`p-10 rounded-xl shadow-lg flex flex-col items-center ${
+              dark ? "bg-[#181825]" : "bg-[#D2D6EF]"
+            }`}
+          >
+            <h2
+              className={`mb-4 text-lg font-bold ${
+                dark ? "text-[#D2D6EF]" : "text-[#6331c9]"
+              }`}
+            >
+              Add {bulkModal.files.length} PDFs
+            </h2>
+            <ul className="mb-4 max-h-40 overflow-y-auto w-64 text-sm text-[#6331c9] dark:text-[#D2D6EF] text-left">
+              {bulkModal.files.map((f) => (
+                <li key={f} className="truncate">
+                  {f.split(/[\\/]/).pop()}
+                </li>
+              ))}
+            </ul>
+            <div className="flex gap-2">
+              <button
+                className={`px-4 py-2 rounded-2xl font-semibold ${
+                  dark ? buttonDark : buttonLight
+                }`}
+                onClick={confirmBulkAddPdf}
+              >
+                Add All
+              </button>
+              <button
+                className="px-4 py-2 rounded-2xl font-semibold bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]"
+                onClick={() => setBulkModal({ open: false, files: [] })}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {deleteModal.open && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
+          <div
+            className={`p-8 rounded-xl shadow-lg flex flex-col items-center ${
+              dark ? "bg-[#181825]" : "bg-white"
+            }`}
+          >
+            <h2
+              className={`mb-4 text-lg font-bold ${
+                dark ? "text-[#D2D6EF]" : "text-[#6331c9]"
+              }`}
+            >
+              Delete PDF
+            </h2>
+            <div className="mb-4 text-center text-[#6331c9] dark:text-[#D2D6EF]">
+              Are you sure you want to delete{" "}
+              <b>
+                {deleteModal.file
+                  ? deleteModal.file.slice(0, 15) +
+                    (deleteModal.file.length > 15 ? "..." : "")
+                  : ""}
+              </b>
+              ?{" "}
+            </div>
+            <div className="flex gap-2">
+              <button
+                className={`cursor-pointer px-4 py-2 rounded-2xl font-semibold ${
+                  dark ? buttonDark : buttonLight
+                }`}
+                onClick={confirmDeletePdf}
+              >
+                Delete
+              </button>
+              <button
+                className="cursor-pointer px-4 py-2 rounded-2xl font-semibold bg-gray-300 text-[#6331c9] hover:bg-[#b8bce0]"
+                onClick={() => setDeleteModal({ open: false, file: null })}
               >
                 Cancel
               </button>

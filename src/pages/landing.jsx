@@ -51,11 +51,7 @@ export default function Landing() {
                 <p className="text-[#6331c9] text-center">
                     All your university notes and lecture PDFs, organized in one place. <br />Study <b>smarter</b>, not harder.
                 </p>
-                <button
-                    onClick={() => navigate("/getStarted", { state: { temp } })}
-                    className="w-30 bg-[#a6aae3] text-[#6331c9] rounded-4xl h-10 mt-4 cursor-pointer hover:bg-[#6331c9] hover:text-white hover:w-55 hover:rounded-2xl transition-all duration-500 ease-in-out">
-                    Start
-                </button>
+                \
             </div>
             {!integration ? (
                 <p className='text-[#6331c9] text-center absolute bottom-2 w-120'>

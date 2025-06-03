@@ -238,6 +238,15 @@ ipcMain.handle("add-pdf-to-exam", (event, examName, filePath) => {
   return true;
 });
 
+ipcMain.handle("open-pdf-dialog-multi", async () => {
+  const result = await dialog.showOpenDialog({
+    filters: [{ name: "PDF", extensions: ["pdf"] }],
+    properties: ["openFile", "multiSelections"],
+  });
+  if (result.canceled || !result.filePaths.length) return [];
+  return result.filePaths;
+});
+
 ipcMain.handle("get-pdf-base64", (event, examName, fileName) => {
   const filePath = path.join(getExamsDir(), examName, fileName);
   if (!fs.existsSync(filePath)) return null;
