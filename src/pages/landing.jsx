@@ -51,7 +51,7 @@ export default function Landing() {
                 <p className="text-[#6331c9] text-center">
                     All your university notes and lecture PDFs, organized in one place. <br />Study <b>smarter</b>, not harder.
                 </p>
-                \
+                
             </div>
             {!integration ? (
                 <p className='text-[#6331c9] text-center absolute bottom-2 w-120'>
